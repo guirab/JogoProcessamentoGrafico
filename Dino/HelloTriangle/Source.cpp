@@ -68,7 +68,6 @@ int main()
 
 	// consts
 	int dificuldade = 0;
-	int c = 0;
 	float dinoPos = 400.0f;
 	float mirror = 120.0f;
 
@@ -122,7 +121,6 @@ int main()
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
 	{
-		//c = _getch_nolock();
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
 
@@ -157,7 +155,6 @@ int main()
 		//---------------DINO-------------------------
 		model = glm::mat4(1); //matriz identidade
 		model = glm::translate(model, glm::vec3(dinoPos, 157.0f, 0.0f));
-		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(mirror, 72.0f, 1.0f));
 		shader.setMat4("model", glm::value_ptr(model));
 
