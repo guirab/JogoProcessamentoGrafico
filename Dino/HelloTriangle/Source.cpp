@@ -1,17 +1,14 @@
-/* Hello Triangle - código adaptado de https://learnopengl.com/#!Getting-started/Hello-Triangle 
- *
- * Adaptado por Rossana Baptista Queiroz
- * para a disciplina de Processamento Gráfico - Jogos Digitais - Unisinos
- * Versão inicial: 7/4/2017
- * Última atualização em 05/03/2022
- *
- */
-
+#include <conio.h>
 #include <iostream>
 #include <string>
 #include <assert.h>
 
 using namespace std;
+
+#define KEY_UP 72
+#define KEY_DOWN 80
+#define KEY_LEFT 75
+#define KEY_RIGHT 77
 
 // GLAD
 #include <glad/glad.h>
@@ -36,7 +33,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 // Protótipos das funções
 int setupGeometry();
 int setupSprite();
-int setupSprite(int nAnimations, int nFrames, float &dx, float &dy);
+int setupSprite(int nAnimations, int nFrames, float& dx, float& dy);
 
 GLuint createTexture(string filePath);
 
@@ -51,21 +48,8 @@ int main()
 	// Inicialização da GLFW
 	glfwInit();
 
-	//Muita atenção aqui: alguns ambientes não aceitam essas configurações
-	//Você deve adaptar para a versão do OpenGL suportada por sua placa
-	//Sugestão: comente essas linhas de código para desobrir a versão e
-	//depois atualize (por exemplo: 4.5 com 4 e 5)
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	//glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-	//Essencial para computadores da Apple
-//#ifdef __APPLE__
-//	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-//#endif
-
 	// Criação da janela GLFW
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Ola Mundo!", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Dinooooo!", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
 
 	// Fazendo o registro da função de callback para a janela GLFW
@@ -81,25 +65,29 @@ int main()
 	// Obtendo as informações de versão
 	const GLubyte* renderer = glGetString(GL_RENDERER); /* get renderer string */
 	const GLubyte* version = glGetString(GL_VERSION); /* version as a string */
+
+	// consts
+	int dificuldade = 0;
+	int c = 0;
+	float dinoPos = 400.0f;
+	float mirror = 120.0f;
+
 	cout << "Renderer: " << renderer << endl;
 	cout << "OpenGL version supported " << version << endl;
 
 	// Definindo as dimensões da viewport com as mesmas dimensões da janela da aplicação
 	int width, height;
-	
-
 
 	// Compilando e buildando o programa de shader
 	Shader shader("../shaders/hello.vs", "../shaders/hello.fs");
 
 	// Gerando um buffer simples, com a geometria de um triângulo
-	
+
 	float dx, dy;
 	GLuint VAO_Fundo = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Meteoro = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Personagem = setupSprite(1, 5, dx, dy);
-	
-	
+
 	int iAnimation = 0;
 	int iFrame = 0;
 	int nFrames = 5;
@@ -115,13 +103,11 @@ int main()
 	//projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 1.0f);
 	projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
 
-	
 	glUseProgram(shader.ID);
 
 	shader.setMat4("projection", glm::value_ptr(projection));
 
 	glUniform1i(glGetUniformLocation(shader.ID, "tex_buffer"), 0);
-
 
 	glActiveTexture(GL_TEXTURE0);
 
@@ -133,12 +119,10 @@ int main()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-
-
-	
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
 	{
+		//c = _getch_nolock();
 		// Checa se houveram eventos de input (key pressed, mouse moved etc.) e chama as funções de callback correspondentes
 		glfwPollEvents();
 
@@ -172,9 +156,9 @@ int main()
 
 		//---------------DINO-------------------------
 		model = glm::mat4(1); //matriz identidade
-		model = glm::translate(model, glm::vec3(100.0f, 170.0f, 0.0f));
-		//model = glm::rotate(model, /*glm::radians(90.0f)*/(float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(120.0f, 72.0f, 1.0f));
+		model = glm::translate(model, glm::vec3(dinoPos, 157.0f, 0.0f));
+		//model = glm::rotate(model, glm::radians(180.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+		model = glm::scale(model, glm::vec3(mirror, 72.0f, 1.0f));
 		shader.setMat4("model", glm::value_ptr(model));
 
 		shader.setVec2("offsets", iFrame * dx, iAnimation * dy);
@@ -197,15 +181,37 @@ int main()
 		glBindVertexArray(VAO_Meteoro);
 		glBindTexture(GL_TEXTURE_2D, texID_Meteoro);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
-		yMeteoro -= 15;
+
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+			mirror = 120.0f;
+			if(dinoPos < 750){
+				dinoPos += 10.0f;
+			}
+		}
+		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+			mirror = -120.0f;
+			if (dinoPos > 50) {
+				dinoPos -= 10.0f;
+			}
+		}
+
+		yMeteoro -= 6;
+
 		if (yMeteoro <= 0.0)
 		{
+			dificuldade += 1;
 			yMeteoro = 700;
 			xMeteoro = 64 + rand() % 736;
 		}
+		//----------------INCREASE LEVEL------------
+		if (dificuldade >= 5 && dificuldade <= 10) {
+			yMeteoro -= 10;
+		}
+		if (dificuldade >= 10) {
+			yMeteoro -= 18;
+		} 
 
 		glBindVertexArray(0);
-
 		// Troca os buffers da tela
 		glfwSwapBuffers(window);
 	}
@@ -222,10 +228,17 @@ int main()
 // ou solta via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	//if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+	//	dinoPos += 100.0f;
+	//}
+	//if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+	//	dinoPos -= 100.0f;
+	//}
+	//cout << dinoPos;
 }
-
 
 // Esta função está bastante harcoded - objetivo é criar os buffers que armazenam a 
 // geometria de um triângulo
@@ -241,7 +254,7 @@ int setupGeometry()
 	GLfloat vertices[] = {
 		//x   y     z    s    t
 		-0.5, -0.5, 0.0, 0.0, 0.0,
-		 0.5, -0.5, 0.0, 1.0, 0.0, 
+		 0.5, -0.5, 0.0, 1.0, 0.0,
 		 0.0,  0.5, 0.0, 0.5, 1.0
 		 //outro triangulo vai aqui
 	};
@@ -273,15 +286,15 @@ int setupGeometry()
 	glEnableVertexAttribArray(0);
 
 	//Atributo coord de textura
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*) (3 * sizeof(GLfloat)));
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 	glEnableVertexAttribArray(1);
 
 	// Observe que isso é permitido, a chamada para glVertexAttribPointer registrou o VBO como o objeto de buffer de vértice 
 	// atualmente vinculado - para que depois possamos desvincular com segurança
-	glBindBuffer(GL_ARRAY_BUFFER, 0); 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	// Desvincula o VAO (é uma boa prática desvincular qualquer buffer ou array para evitar bugs medonhos)
-	glBindVertexArray(0); 
+	glBindVertexArray(0);
 
 	return VAO;
 }
