@@ -67,7 +67,7 @@ int main()
 	const GLubyte* version = glGetString(GL_VERSION); /* version as a string */
 
 	// consts
-	int dificuldade = 0;
+	int dificuldade = 1;
 	float dinoPos = 400.0f;
 	float mirror = 120.0f;
 
@@ -90,6 +90,8 @@ int main()
 	int iAnimation = 0;
 	int iFrame = 0;
 	int nFrames = 5;
+	float velocidade = 0.1f;
+	int nivel = 1;
 
 	float xMeteoro = 400.0f, yMeteoro = 700.0f;
 
@@ -182,31 +184,34 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 			mirror = 120.0f;
 			if(dinoPos < 750){
-				dinoPos += 10.0f;
+				dinoPos += 1.0f;
 			}
 		}
 		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
 			mirror = -120.0f;
 			if (dinoPos > 50) {
-				dinoPos -= 10.0f;
+				dinoPos -= 1.0f;
 			}
 		}
 
-		yMeteoro -= 6;
+		yMeteoro -= velocidade;
 
-		if (yMeteoro <= 0.0)
+		if ((xMeteoro <= dinoPos + 55.0f && xMeteoro >= dinoPos - 55.0f) 
+			&& yMeteoro <= 160.0f) {
+			cout << "Faleceu - xM: " + to_string(xMeteoro) + " yM: " + to_string(yMeteoro) + " Dino: " + to_string(dinoPos) << endl;
+		}
+				
+		if (yMeteoro < 0.0f)
 		{
-			dificuldade += 1;
+			dificuldade++;
 			yMeteoro = 700;
 			xMeteoro = 64 + rand() % 736;
-		}
-		//----------------INCREASE LEVEL------------
-		if (dificuldade >= 5 && dificuldade <= 10) {
-			yMeteoro -= 10;
-		}
-		if (dificuldade >= 10) {
-			yMeteoro -= 18;
-		} 
+
+			if (dificuldade % 10 == 0.0f) {
+				nivel++; // valor que vai aparecer na tela
+				velocidade += 0.01f;
+			}
+		}		
 
 		glBindVertexArray(0);
 		// Troca os buffers da tela
@@ -228,13 +233,6 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
-	//if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-	//	dinoPos += 100.0f;
-	//}
-	//if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-	//	dinoPos -= 100.0f;
-	//}
-	//cout << dinoPos;
 }
 
 // Esta função está bastante harcoded - objetivo é criar os buffers que armazenam a 
