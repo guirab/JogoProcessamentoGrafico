@@ -86,18 +86,23 @@ int main()
 	GLuint VAO_Fundo = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Meteoro = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Personagem = setupSprite(1, 5, dx, dy);
+	GLuint VAO_GameOver = setupSprite(1, 1, dx, dy);
+	GLuint VAO_Explosao = setupSprite(1, 1, dx, dy);
 
 	int iAnimation = 0;
 	int iFrame = 0;
 	int nFrames = 5;
-	float velocidade = 0.1f;
+	float velocidade = 0.5f;
 	int nivel = 1;
+	bool gameOver = false;
 
 	float xMeteoro = 400.0f, yMeteoro = 700.0f;
 
 	GLuint texID_Fundo = createTexture("../textures/desert-100.jpg");
 	GLuint texID_Personagem = createTexture("../textures/dinoanda.png");
 	GLuint texID_Meteoro = createTexture("../textures/flaming_meteor.png");
+	GLuint texID_GameOver = createTexture("../textures/game_over.png");
+	GLuint texID_Explosao = createTexture("../textures/explosion.png");
 
 	//Matriz de projeção
 	glm::mat4 projection = glm::mat4(1); //matriz identidade
@@ -181,24 +186,67 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texID_Meteoro);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
-		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && !gameOver) {
 			mirror = 120.0f;
+			iFrame++;
 			if(dinoPos < 750){
 				dinoPos += 1.0f;
 			}
 		}
-		if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && !gameOver) {
 			mirror = -120.0f;
+			iFrame++;
 			if (dinoPos > 50) {
 				dinoPos -= 1.0f;
 			}
+		}
+		else
+		{
+			iFrame = 0;
+		}
+		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && gameOver) {	
+			xMeteoro = 400.0f; 
+			yMeteoro = 700.0f;
+			velocidade = 0.5f;
+			nivel = 1;
+			gameOver = false;
+			dificuldade = 1;
+			dinoPos = 400.0f;
+			mirror = 120.0f;
 		}
 
 		yMeteoro -= velocidade;
 
 		if ((xMeteoro <= dinoPos + 55.0f && xMeteoro >= dinoPos - 55.0f) 
-			&& yMeteoro <= 160.0f) {
-			cout << "Faleceu - xM: " + to_string(xMeteoro) + " yM: " + to_string(yMeteoro) + " Dino: " + to_string(dinoPos) << endl;
+			&& yMeteoro <= 160.0f && yMeteoro >= 128.0f) 
+		{
+			gameOver = true;
+
+			glm::mat4 model = glm::mat4(1);
+			model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(410.0f, 159.0f, 1.0f));
+			shader.setMat4("model", glm::value_ptr(model));
+			shader.setVec2("offsets", 1, 1);
+
+			glBindVertexArray(VAO_GameOver);
+			glBindTexture(GL_TEXTURE_2D, texID_GameOver);
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			model = glm::mat4(1);
+			model = glm::translate(model, glm::vec3(xMeteoro, yMeteoro, 0.0f));
+			model = glm::scale(model, glm::vec3(100.0f, 100.0f, 1.0f));
+			shader.setMat4("model", glm::value_ptr(model));
+			shader.setVec2("offsets", 1, 1);
+
+			glBindVertexArray(VAO_Explosao);
+			glBindTexture(GL_TEXTURE_2D, texID_Explosao);
+
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+
+			velocidade = 0;
+
+			//cout << "Faleceu - xM: " + to_string(xMeteoro) + " yM: " + to_string(yMeteoro) + " Dino: " + to_string(dinoPos) << endl;
 		}
 				
 		if (yMeteoro < 0.0f)
@@ -209,7 +257,7 @@ int main()
 
 			if (dificuldade % 10 == 0.0f) {
 				nivel++; // valor que vai aparecer na tela
-				velocidade += 0.01f;
+				velocidade += 0.1f;
 			}
 		}		
 

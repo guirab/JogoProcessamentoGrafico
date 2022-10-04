@@ -1,5 +1,5 @@
 ﻿  Source.cpp
-C:\Users\brunno.zonatto\Desktop\Processamento Gráfico\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(208,18): warning C4244: '=': conversão de 'int' para 'float', possível perda de dados
-C:\Users\brunno.zonatto\Desktop\Processamento Gráfico\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(397,11): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
-C:\Users\brunno.zonatto\Desktop\Processamento Gráfico\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(398,11): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
-  HelloTriangle.vcxproj -> C:\Users\brunno.zonatto\Desktop\Processamento Gráfico\JogoProcessamentoGrafico\Dino\Debug\HelloTriangle.exe
+C:\Users\brzon\Desktop\Trabalho GA\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(249,18): warning C4244: '=': conversão de 'int' para 'float', possível perda de dados
+C:\Users\brzon\Desktop\Trabalho GA\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(438,11): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+C:\Users\brzon\Desktop\Trabalho GA\JogoProcessamentoGrafico\Dino\HelloTriangle\Source.cpp(439,11): warning C4244: '=': conversão de 'double' para 'float', possível perda de dados
+  HelloTriangle.vcxproj -> C:\Users\brzon\Desktop\Trabalho GA\JogoProcessamentoGrafico\Dino\Debug\HelloTriangle.exe
