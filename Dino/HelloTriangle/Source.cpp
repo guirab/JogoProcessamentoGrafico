@@ -23,7 +23,6 @@ using namespace std;
 
 //STB_IMAGE
 #include "stb_image.h"
-
 #include "Shader.h"
 
 
@@ -31,6 +30,7 @@ using namespace std;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 
 // Protótipos das funções
+float nivelCalc(int nivel, int casa);
 int setupGeometry();
 int setupSprite(int nAnimations, int nFrames, float& dx, float& dy);
 
@@ -84,8 +84,10 @@ int main()
 	float dx, dy;
 	GLuint VAO_Fundo = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Meteoro = setupSprite(1, 1, dx, dy);
-	GLuint VAO_GameOver = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Explosao = setupSprite(1, 1, dx, dy);
+	GLuint VAO_Life = setupSprite(1, 1, dx, dy);
+	GLuint VAO_GameOver = setupSprite(1, 1, dx, dy);
+	GLuint VAO_Numeros = setupSprite(1, 10, dx, dy);
 	GLuint VAO_Personagem = setupSprite(1, 5, dx, dy);
 
 	int iAnimation = 0;
@@ -94,6 +96,8 @@ int main()
 	float velocidade = 0.5f;
 	int nivel = 1;
 	bool gameOver = false;
+	int lifes = 3;
+	bool met = true;
 
 	float xMeteoro = 400.0f, yMeteoro = 700.0f;
 
@@ -102,6 +106,8 @@ int main()
 	GLuint texID_Meteoro = createTexture("../textures/flaming_meteor.png");
 	GLuint texID_GameOver = createTexture("../textures/game_over.png");
 	GLuint texID_Explosao = createTexture("../textures/explosion.png");
+	GLuint texID_Numeros = createTexture("../textures/numeros.png");
+	GLuint texID_Life = createTexture("../textures/life.png");
 
 	//Matriz de projeção
 	glm::mat4 projection = glm::mat4(1); //matriz identidade
@@ -122,7 +128,7 @@ int main()
 
 	//Habilitando a transparência
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
 
 	// Loop da aplicação - "game loop"
 	while (!glfwWindowShouldClose(window))
@@ -172,6 +178,89 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texID_Personagem);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		//---------------LIFES---------------------------		
+		if (lifes >= 1) 
+		{
+			model = glm::mat4(1); //matriz identidade
+			model = glm::translate(model, glm::vec3(20.0f, 550.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(30.0f, 30.0f, 1.0f));
+			shader.setMat4("model", glm::value_ptr(model));
+
+			shader.setVec2("offsets", 1, 1);
+
+			glBindVertexArray(VAO_Life);
+			glBindTexture(GL_TEXTURE_2D, texID_Life);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		if (lifes >= 2) {
+			model = glm::mat4(1); //matriz identidade
+			model = glm::translate(model, glm::vec3(60.0f, 550.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(30.0f, 30.0f, 1.0f));
+			shader.setMat4("model", glm::value_ptr(model));
+
+			shader.setVec2("offsets", 1, 1);
+
+			glBindVertexArray(VAO_Life);
+			glBindTexture(GL_TEXTURE_2D, texID_Life);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		if (lifes == 3) {
+			model = glm::mat4(1); //matriz identidade
+			model = glm::translate(model, glm::vec3(100.0f, 550.0f, 0.0f));
+			model = glm::scale(model, glm::vec3(30.0f, 30.0f, 1.0f));
+			shader.setMat4("model", glm::value_ptr(model));
+
+			shader.setVec2("offsets", 1, 1);
+
+			glBindVertexArray(VAO_Life);
+			glBindTexture(GL_TEXTURE_2D, texID_Life);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+		}
+
+		//--------------LEVELS-----------------------
+		model = glm::mat4(1); //matriz identidade
+		model = glm::translate(model, glm::vec3(730.0f, 550.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(30.0f, 50.0f, 0.0f));
+		shader.setMat4("model", glm::value_ptr(model));
+		
+		if (dificuldade > 99)
+			shader.setVec2("offsets", nivelCalc(dificuldade, 0), 1);
+
+		glBindVertexArray(VAO_Numeros);
+		glBindTexture(GL_TEXTURE_2D, texID_Numeros);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		model = glm::mat4(1); //matriz identidade
+		model = glm::translate(model, glm::vec3(755.0f, 550.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(30.0f, 50.0f, 0.0f));
+		shader.setMat4("model", glm::value_ptr(model));
+
+		if (dificuldade > 9)
+			shader.setVec2("offsets", nivelCalc(dificuldade, 0), 1);
+
+		glBindVertexArray(VAO_Numeros);
+		glBindTexture(GL_TEXTURE_2D, texID_Numeros);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		model = glm::mat4(1); //matriz identidade
+		model = glm::translate(model, glm::vec3(780.0f, 550.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(30.0f, 50.0f, 0.0f));
+		shader.setMat4("model", glm::value_ptr(model));
+
+		if (dificuldade < 10)
+			shader.setVec2("offsets", nivelCalc(dificuldade, 0), 1);
+		else if (dificuldade >= 10 && dificuldade < 100)
+			shader.setVec2("offsets", nivelCalc(dificuldade, 1), 1);
+		else
+			shader.setVec2("offsets", nivelCalc(dificuldade, 2), 1);
+
+		glBindVertexArray(VAO_Numeros);
+		glBindTexture(GL_TEXTURE_2D, texID_Numeros);
+		glDrawArrays(GL_TRIANGLES, 0, 6);	
+		
+
 		//--------------METEORO--------------------------
 		model = glm::mat4(1); //matriz identidade
 		model = glm::translate(model, glm::vec3(xMeteoro, yMeteoro, 0.0f));
@@ -212,42 +301,56 @@ int main()
 			dificuldade = 1;
 			dinoPos = 400.0f;
 			mirror = 120.0f;
+			lifes = 3;
+			met = true;
 		}
 
 		yMeteoro -= velocidade;
 
 		if ((xMeteoro <= dinoPos + 55.0f && xMeteoro >= dinoPos - 55.0f) 
 			&& yMeteoro <= 160.0f && yMeteoro >= 128.0f) 
-		{
-			gameOver = true;
-
-			glm::mat4 model = glm::mat4(1);
-			model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
-			model = glm::scale(model, glm::vec3(410.0f, 159.0f, 1.0f));
-			shader.setMat4("model", glm::value_ptr(model));
-			shader.setVec2("offsets", 1, 1);
-
-			glBindVertexArray(VAO_GameOver);
-			glBindTexture(GL_TEXTURE_2D, texID_GameOver);
-
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-
+		{				
+			if (met && lifes > 0)
+			{
+				--lifes;
+				met = false;
+			}
+			
+			glm::mat4 model = glm::mat4(1);		
 			model = glm::mat4(1);
 			model = glm::translate(model, glm::vec3(xMeteoro, yMeteoro, 0.0f));
-			model = glm::scale(model, glm::vec3(160.0f, 160.0f, 1.0f));
+			model = glm::scale(model, glm::vec3(200.0f, 200.0f, 1.0f));
 			shader.setMat4("model", glm::value_ptr(model));
 			shader.setVec2("offsets", 1, 1);
 
 			glBindVertexArray(VAO_Explosao);
 			glBindTexture(GL_TEXTURE_2D, texID_Explosao);
 
-			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glDrawArrays(GL_TRIANGLES, 0, 6);	
 
-			velocidade = 0;			
+			if (lifes == 0)
+			{
+				glm::mat4 model = glm::mat4(1);
+				model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
+				model = glm::scale(model, glm::vec3(410.0f, 159.0f, 1.0f));
+				shader.setMat4("model", glm::value_ptr(model));
+				shader.setVec2("offsets", 1, 1);
+
+				glBindVertexArray(VAO_GameOver);
+				glBindTexture(GL_TEXTURE_2D, texID_GameOver);
+
+				glDrawArrays(GL_TRIANGLES, 0, 6);
+
+				gameOver = true;
+				velocidade = 0;
+			}
+
+			
 		}
 				
 		if (yMeteoro < 0.0f)
-		{
+		{	
+			met = true;
 			dificuldade++;
 			yMeteoro = 700;
 			xMeteoro = 64 + rand() % 736;
@@ -280,6 +383,35 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
+}
+
+float nivelCalc(int nivel, int casa) {
+	string nivelToString = to_string(nivel);
+	char nivelSplit = nivelToString.at(casa);	
+
+	switch (nivelSplit)
+	{
+		case '1':
+			return 0.1f;
+		case '2':
+			return 0.2f;
+		case '3':
+			return 0.3f;
+		case '4':
+			return 0.4f;
+		case '5':
+			return 0.5f;
+		case '6':
+			return 0.6f;
+		case '7':
+			return 0.7f;
+		case '8':
+			return 0.8f;
+		case '9':
+			return 0.9f;
+		default:
+			return 0.0f;
+	}	
 }
 
 // Esta função está bastante harcoded - objetivo é criar os buffers que armazenam a 
