@@ -64,6 +64,15 @@ int main()
 	int dificuldade = 1;
 	float dinoPos = 400.0f;
 	float mirror = 120.0f;
+	int iAnimation = 0;
+	int iFrame = 0;
+	int nFrames = 5;
+	float velocidade = 8.0f;
+	int nivel = 1;
+	bool gameOver = false;
+	int lifes = 3;
+	bool met = true;
+	float xMeteoro = 400.0f, yMeteoro = 700.0f;
 
 	cout << "Renderer: " << renderer << endl;
 	cout << "OpenGL version supported " << version << endl;
@@ -83,17 +92,6 @@ int main()
 	GLuint VAO_GameOver = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Numeros = setupSprite(1, 10, dx, dy);
 	GLuint VAO_Personagem = setupSprite(1, 5, dx, dy);
-
-	int iAnimation = 0;
-	int iFrame = 0;
-	int nFrames = 5;
-	float velocidade = 8.0f;
-	int nivel = 1;
-	bool gameOver = false;
-	int lifes = 3;
-	bool met = true;
-
-	float xMeteoro = 400.0f, yMeteoro = 700.0f;
 
 	GLuint texID_Fundo = createTexture("../textures/desert-100.jpg");
 	GLuint texID_Personagem = createTexture("../textures/dinoanda.png");
@@ -143,7 +141,6 @@ int main()
 		//Matriz de transformação do objeto
 		glm::mat4 model = glm::mat4(1); //matriz identidade
 		model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
-		//model = glm::rotate(model, /*glm::radians(90.0f)*/(float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(1080.0f, 540.0f, 1.0f));
 		shader.setMat4("model", glm::value_ptr(model));
 
@@ -253,7 +250,6 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texID_Numeros);
 		glDrawArrays(GL_TRIANGLES, 0, 6);	
 		
-
 		//--------------METEORO--------------------------
 		model = glm::mat4(1); //matriz identidade
 		model = glm::translate(model, glm::vec3(xMeteoro, yMeteoro, 0.0f));
