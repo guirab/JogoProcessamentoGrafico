@@ -80,7 +80,6 @@ int main()
 	Shader shader("../shaders/hello.vs", "../shaders/hello.fs");
 
 	// Gerando um buffer simples, com a geometria de um triângulo
-
 	float dx, dy;
 	GLuint VAO_Fundo = setupSprite(1, 1, dx, dy);
 	GLuint VAO_Meteoro = setupSprite(1, 1, dx, dy);
@@ -93,7 +92,7 @@ int main()
 	int iAnimation = 0;
 	int iFrame = 0;
 	int nFrames = 5;
-	float velocidade = 0.5f;
+	float velocidade = 8.0f;
 	int nivel = 1;
 	bool gameOver = false;
 	int lifes = 3;
@@ -111,7 +110,6 @@ int main()
 
 	//Matriz de projeção
 	glm::mat4 projection = glm::mat4(1); //matriz identidade
-	//projection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 1.0f);
 	projection = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f, -1.0f, 1.0f);
 
 	glUseProgram(shader.ID);
@@ -264,7 +262,6 @@ int main()
 		//--------------METEORO--------------------------
 		model = glm::mat4(1); //matriz identidade
 		model = glm::translate(model, glm::vec3(xMeteoro, yMeteoro, 0.0f));
-		//model = glm::rotate(model, /*glm::radians(90.0f)*/(float) glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 		model = glm::scale(model, glm::vec3(64.0f, 64.0f, 1.0f));
 		shader.setMat4("model", glm::value_ptr(model));
 
@@ -274,18 +271,19 @@ int main()
 		glBindTexture(GL_TEXTURE_2D, texID_Meteoro);
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 
+		//--------------MOVIMENTAÇAO--------------------------
 		if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS && !gameOver) {
 			mirror = 120.0f;
 			iFrame++;
 			if(dinoPos < 750){
-				dinoPos += 1.0f;
+				dinoPos += 5.0f;
 			}
 		}
 		else if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS && !gameOver) {
 			mirror = -120.0f;
 			iFrame++;
 			if (dinoPos > 50) {
-				dinoPos -= 1.0f;
+				dinoPos -= 5.0f;
 			}
 		}
 		else
@@ -295,7 +293,7 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS && gameOver) {	
 			xMeteoro = 400.0f; 
 			yMeteoro = 700.0f;
-			velocidade = 0.5f;
+			velocidade = 8.0f;
 			nivel = 1;
 			gameOver = false;
 			dificuldade = 1;
@@ -307,6 +305,7 @@ int main()
 
 		yMeteoro -= velocidade;
 
+		//--------------COLISAO--------------------------
 		if ((xMeteoro <= dinoPos + 55.0f && xMeteoro >= dinoPos - 55.0f) 
 			&& yMeteoro <= 160.0f && yMeteoro >= 128.0f) 
 		{				
@@ -344,10 +343,8 @@ int main()
 				gameOver = true;
 				velocidade = 0;
 			}
-
-			
 		}
-				
+		//--------------NIVEL--------------------------
 		if (yMeteoro < 0.0f)
 		{	
 			met = true;
@@ -357,9 +354,7 @@ int main()
 
 			if (dificuldade % 10 == 0.0f) {
 				nivel++;
-				velocidade += 0.1f;
-
-				cout << nivel << endl;
+				velocidade += 5.0f;
 			}			
 		}		
 
@@ -385,6 +380,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 }
 
+//--------------TEXTO NIVEL--------------------------
 float nivelCalc(int nivel, int casa) {
 	string nivelToString = to_string(nivel);
 	char nivelSplit = nivelToString.at(casa);	
@@ -430,7 +426,6 @@ int setupGeometry()
 		-0.5, -0.5, 0.0, 0.0, 0.0,
 		 0.5, -0.5, 0.0, 1.0, 0.0,
 		 0.0,  0.5, 0.0, 0.5, 1.0
-		 //outro triangulo vai aqui
 	};
 
 	GLuint VBO, VAO;
